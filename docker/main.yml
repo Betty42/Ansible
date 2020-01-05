@@ -51,7 +51,7 @@
     - name: Restart Docker
       service:
         name: docker
-        state: restarted    - name: create docker group
+        state: restarted
 
     - name: create docker group
       group:
