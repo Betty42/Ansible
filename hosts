@@ -1,12 +1,12 @@
 [ubuntu]
-172.31.46.76
-172.31.45.170
+*
+*
 
 [ubuntu:vars]
 ansible_user = '{{ubuntu_user}}'
 
 [redhat]
-172.31.38.127
+*
 
 [redhat:vars]
 ansible_user = '{{redhat_user}}'
