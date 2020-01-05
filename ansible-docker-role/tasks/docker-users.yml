@@ -1,0 +1,26 @@
+---
+- name: Ensure docker group exists.
+  group:
+    name: docker
+    state: present
+
+- name: Ensure docker users are added to the docker group.
+  user:
+    name: '{{ item }}'
+    groups: docker
+    append: true
+  with_items: '{{ docker_redhat_users }}'
+  when: ansible_distribution == 'RedHat'
+  become: true
+  become_method: sudo
+
+- name: Ensure docker users are added to the docker group.
+  user:
+    name: '{{ item }}'
+    groups: docker
+    append: true
+  with_items: '{{ docker_ubuntu_users }}'
+  when: ansible_distribution == 'Ubuntu'
+  become: true
+  become_method: sudo
+~                      

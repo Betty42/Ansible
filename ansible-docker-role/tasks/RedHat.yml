@@ -1,0 +1,68 @@
+---
+- name: Ensure old versions of Docker are not installed.
+  package:
+    name:
+      - docker
+      - docker-common
+      - docker-engine
+    state: absent
+  become: true
+  become_method: sudo
+
+- name: Add Docker GPG key.
+  rpm_key:
+    key: https://download.docker.com/linux/centos/gpg
+    state: present
+  become: true
+  become_method: sudo
+
+- name: Install container-selinux
+  package:
+    name: http://vault.centos.org/centos/7.3.1611/extras/x86_64/Packages/container-selinux-2.9-4.el7.noarch.rpm
+    state: present
+  when: ansible_distribution_major_version | int == 7
+
+- name: Install yum packages
+  yum:
+    name:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+  become: true
+  become_method: sudo
+  
+- name: Add Docker repository.
+  get_url:
+    url: "{{ docker_yum_repo_url }}"
+    dest: '/etc/yum.repos.d/docker-{{ docker_edition }}.repo'
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  become_method: sudo
+
+- name: Install containerd separately (CentOS 8).
+  package:
+    name: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm
+    state: present
+  when: ansible_distribution_major_version | int == 8
+  become: true
+  become_method: sudo
+
+- name: Install Docker
+  package:
+    name: '{{docker_package}}'
+    state: '{{docker_package_state}}'
+  notify: Restart Docker
+  become: true
+  become_method: sudo
+
+- name: Enable Docker
+  service:
+    name: docker
+    state: '{{docker_service_state}}'
+    enabled: '{{docker_service_enabled}}'
+  become: true
+  become_method: sudo
+
